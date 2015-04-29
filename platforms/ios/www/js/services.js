@@ -49,27 +49,55 @@ angular.module('starter.services', [])
   };
 })
 
-.factory('DB', function($q, DB_CONFIG) {
+.factory('DB', function($q, DB_CONFIG, $window, $location, $state, $ionicViewService) {
   var self = this;
   self.db = null;
          
   self.init = function() {
-    // Use self.db = window.sqlitePlugin.openDatabase({name: DB_CONFIG.name}); in production
-    self.db = window.openDatabase(DB_CONFIG.name, '1.0', 'database', -1);
+         document.addEventListener("deviceready", function() {
+                                   console.log('** cordova ready **');
+                                   
+             
+    try{
+      if(window.sqlitePlugin){
          
-    angular.forEach(DB_CONFIG.tables, function(table) {
-      var columns = [];
+        // Use self.db = window.sqlitePlugin.openDatabase({name: DB_CONFIG.name}); in production
+                                   //self.db = window.openDatabase(DB_CONFIG.name, '1.0', 'database', -1);
+        self.db = window.sqlitePlugin.openDatabase({name: DB_CONFIG.name});
+
+        angular.forEach(DB_CONFIG.tables, function(table) {
+          var columns = [];
                          
-      angular.forEach(table.columns, function(column) {
-        columns.push(column.name + ' ' + column.type);
-      });
+          angular.forEach(table.columns, function(column) {
+            columns.push(column.name + ' ' + column.type);
+          });
+
+          var query = 'CREATE TABLE IF NOT EXISTS ' + table.name + ' (' + columns.join(',') + ')';
+          self.query(query);
                          
-      var query = 'CREATE TABLE IF NOT EXISTS ' + table.name + ' (' + columns.join(',') + ')';
-      self.query(query);
-      console.log('Table ' + table.name + ' initialized');
-    });
+          console.log('Table ' + table.name + ' initialized');
+        });
+                                   
+        self.query("select count(id) as cnt from users").then(function(result){
+//        alert("result.rows.length: " + result.rows.length + " -- should be 1");
+//        alert("result.rows.item(0).cnt: " + result.rows.item(0).cnt + " -- should be 1");
+          if(result.rows.item(0).cnt < 1) {
+            //$location.path('/setpin');
+            $ionicViewService.nextViewOptions({
+              disableBack: true
+            });
+            $state.go('setpin');
+          }
+        });
+      } else {
+                                   //alert("rejected");
+      }
+    } catch(e) {
+                                   //alert("error throwb:: " + e);
+    }
+    }, false);
   };
-         
+  
   self.query = function(query, bindings) {
     bindings = typeof bindings !== 'undefined' ? bindings : [];
     var deferred = $q.defer();
@@ -102,22 +130,27 @@ angular.module('starter.services', [])
   return self;
 })
 
-// Resource service example
-.factory('Document', function(DB) {
+
+.factory('Users', function(DB) {
   var self = this;
          
   self.all = function() {
-    return DB.query('SELECT * FROM documents')
+         alert("in select all query users");
+    return DB.query('SELECT * FROM users')
       .then(function(result){
-        return DB.fetchAll(result);
+      return DB.fetchAll(result);
     });
   };
          
-  self.getById = function(id) {
-    return DB.query('SELECT * FROM documents WHERE id = ?', [id])
+  self.getPin = function() {
+    return DB.query('SELECT pin FROM users WHERE id = 1')
       .then(function(result){
-        return DB.fetch(result);
+        return result.rows.item(0).pin;
     });
+  };
+         
+  self.setPin = function(pin) {
+    return DB.query("INSERT INTO users (id, pin, created, lastLogin) VALUES (1,?,datetime(),datetime())", [pin]);
   };
          
   return self;
