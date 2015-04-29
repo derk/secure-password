@@ -11,7 +11,7 @@
     <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
     <link href="css/ionic.app.css" rel="stylesheet">
     -->
-
+    
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
 
@@ -26,14 +26,17 @@
         // Wait for Cordova to load
         document.addEventListener("deviceready", onDeviceReady, false);
         
+        
         // Cordova is ready
         function onDeviceReady() {
+            //alert("STOP");
+         /*
           var db = window.sqlitePlugin.openDatabase({name: "spass.db", location: 2});
             
             db.transaction(function(tx) {
               tx.executeSql('DROP TABLE IF EXISTS test_table');
               tx.executeSql('CREATE TABLE IF NOT EXISTS test_table (id integer primary key, data text, data_num integer)');
-            /*
+            
               // demonstrate PRAGMA:
               db.executeSql("pragma table_info (test_table);", [], function(res) {
                 alert("PRAGMA res: " + JSON.stringify(res));
@@ -53,8 +56,8 @@
               }, function(e) {
                 alert("ERROR: " + e.message);
               });
-             */
-          });
+             
+          }); */
         }
     </script>
   </head>
