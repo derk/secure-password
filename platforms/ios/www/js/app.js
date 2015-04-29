@@ -18,12 +18,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       // org.apache.cordova.statusbar required
       StatusBar.styleLightContent();
     }
-    DB.init();
   });
 })
 
+.run(function(DB) {
+  DB.init();
+})
+
 .constant('DB_CONFIG', {
-  name: 'DB',
+  name: 'SPass',
   tables: [
     {
       name: 'users',
@@ -71,6 +74,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     url: '/pin',
     templateUrl: 'templates/pincode.html',
     controller: 'UnlockCtrl'
+  })
+        
+  .state('setpin', {
+    url: '/setpin',
+    templateUrl: 'templates/setpincode.html',
+    controller: 'SetPinCtrl'
   })
         
   // setup an abstract state for the tabs directive
